@@ -4,7 +4,8 @@ class nodejs {
   }
 
   package { 'curl': 
-    ensure => 'installed',
+    ensure => 'latest',
+    require => Exec['apt-get update']
   }
 
   exec { 'nodejs-get-latest':
@@ -13,7 +14,7 @@ class nodejs {
 
   package { 'nodejs':
     ensure => 'latest',
-    require => Exec['nodejs-get-latest'],
+    require => Exec['apt-get update', 'nodejs-get-latest'],
   }
 }
 

@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+tst = ENV['tst'] || 3
+
+Vagrant.configure(2) do |config|
+    config.vm.box = "bento/ubuntu-18.04"
+        
+    config.vm.provision "shell", inline: <<-SHELL
+    wget https://apt.puppetlabs.com/puppet5-release-$(lsb_release -cs).deb
+    dpkg -i puppet5-release-$(lsb_release -cs).deb
+    apt-get -qq update
+    apt-get install -y puppet-agent
+    SHELL
+
+    config.vm.provision "puppet" do |puppet|
+        puppet.environment = "test"
+        puppet.environment_path = "environments"
+    end
+
+    config.vm.define "appserver" do |appserver|
+    end
+    
+    config.vm.define "dbserver" do |dbserver|
+    end
+
+    config.vm.define "web" do |web|
+    end
+    
+    (0..tst-1).each do |i|
+        config.vm.define "tst-#{i}" do |testserver|
+        end
+    end
+end

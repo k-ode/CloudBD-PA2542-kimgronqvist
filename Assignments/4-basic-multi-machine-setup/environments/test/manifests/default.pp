@@ -1,21 +1,27 @@
-class nodejs {
-  exec { 'apt-get update':
-    command => '/usr/bin/apt-get update',
-  }
+exec { 'apt-get update':
+  command => '/usr/bin/apt-get update';
+}
 
-  package { 'curl': 
-    ensure => 'latest',
-    require => Exec['apt-get update']
-  }
-
-  exec { 'nodejs-get-latest':
-    command => '/usr/bin/curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -',
-  }
-
-  package { 'nodejs':
-    ensure => 'latest',
-    require => Exec['apt-get update', 'nodejs-get-latest'],
+node default {
+  notify { 'notify-default':
+    message => 'Not configured'
   }
 }
 
-include nodejs
+node 'appserver' {
+  include nodejs
+}
+
+node 'dbserver' {
+  include mysql
+}
+
+node 'web' {
+  include nginx
+}
+
+node /tst(.*)$/ {
+  notify { 'notify-tst':
+    message => "Configured tst${1}"
+  }
+}

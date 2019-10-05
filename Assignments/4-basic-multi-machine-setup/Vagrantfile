@@ -19,9 +19,9 @@ Vagrant.configure(2) do |config|
         puppet.module_path = "modules"
     end
 
-    # config.vm.define "appserver" do |appserver|
-    #     appserver.vm.hostname = "appserver"
-    # end
+    config.vm.define "appserver" do |appserver|
+        appserver.vm.hostname = "appserver"
+    end
     
     config.vm.define "dbserver" do |dbserver|
         dbserver.vm.hostname = "dbserver"
@@ -32,9 +32,9 @@ Vagrant.configure(2) do |config|
         web.vm.network "forwarded_port", guest: 80, host: 8080
     end
     
-    # (0..tst-1).each do |i|
-    #     config.vm.define "tst#{i}" do |testserver|
-    #        testserver.vm.hostname = "tst#{i}"
-    #     end
-    # end
+    (0..tst-1).each do |i|
+        config.vm.define "tst#{i}" do |testserver|
+           testserver.vm.hostname = "tst#{i}"
+        end
+    end
 end

@@ -1,9 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Trigger: clean up proxy ip
-# Startup: read proxy ip from file
-
 if(File.exist?("proxy_ip"))
     proxyip = File.read("proxy_ip").strip
 end

@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Trigger: clean up proxy ip
+# Startup: read proxy ip from file
+
+if(File.exist?("proxy_ip"))
+    proxyip = File.read("proxy_ip").strip
+end
+
+Vagrant.configure(2) do |config|
+    config.vm.box = "bento/ubuntu-18.04"
+
+    config.vm.network "private_network", type: "dhcp"
+        
+    config.vm.provision "shell", inline: <<-SHELL
+    wget https://apt.puppetlabs.com/puppet5-release-$(lsb_release -cs).deb
+    dpkg -i puppet5-release-$(lsb_release -cs).deb
+    apt-get -qq update
+    apt-get install -y puppet-agent
+    SHELL
+
+    config.vm.provision "puppet" do |puppet|
+        puppet.environment = "test"
+        puppet.environment_path = "environments"
+        puppet.module_path = "modules"
+        puppet.facter = {
+            "proxy_ip": proxyip
+        }
+    end
+
+    config.vm.define "proxy", autostart: false do |proxy|
+        proxy.vm.hostname = "proxy"
+        proxy.vm.provision "shell", inline: "hostname -I | awk '{print $NF }' > /vagrant/proxy_ip"
+    end
+    
+    config.vm.define "appserver" do |appserver|
+        appserver.vm.hostname = "appserver"
+    end
+
+end

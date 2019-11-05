@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+    config.vm.box = "bento/ubuntu-18.04"
+
+    config.vm.provision "shell", inline: <<-SHELL
+    wget https://apt.puppetlabs.com/puppet5-release-$(lsb_release -cs).deb
+    dpkg -i puppet5-release-$(lsb_release -cs).deb
+    apt-get -qq update
+    apt-get install -y puppet-agent
+    SHELL
+
+    config.vm.provision "puppet" do |puppet|
+        puppet.environment = "test"
+        puppet.environment_path = "environments"
+    end
+    
+    config.vm.define "appserver" do |appserver|
+        appserver.vm.network "private_network", ip: "172.28.128.2"
+        appserver.vm.hostname = "appserver"
+    end
+
+    config.vm.define "dbserver" do |dbserver|
+        dbserver.vm.network "private_network", ip: "172.28.128.3"
+        dbserver.vm.hostname = "dbserver"
+    end
+
+end
